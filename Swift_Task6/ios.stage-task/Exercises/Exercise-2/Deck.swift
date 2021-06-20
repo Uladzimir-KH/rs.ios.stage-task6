@@ -1,5 +1,6 @@
 import Foundation
 
+
 protocol DeckBaseCompatible: Codable {
     var cards: [Card] {get set}
     var type: DeckType {get}
@@ -28,26 +29,44 @@ extension Deck {
 
     init(with type: DeckType) {
         self.type = type
+        cards = createDeck(suits: Suit.allCases, values: Value.allCases)
+        
     }
 
     public func createDeck(suits:[Suit], values:[Value]) -> [Card] {
-        []
+        var cardsList: [Card] = []
+        suits.forEach() { s in
+            values.forEach() { v in
+                cardsList.append(Card(suit: s, value: v, isTrump: false))
+            }
+        }
+        print(cardsList)
+        return cardsList
     }
 
-    public func shuffle() {
-
+    public mutating func shuffle() {
+        cards.shuffle()
     }
 
-    public func defineTrump() {
-
+    public mutating func defineTrump() {
+        trump = cards.last?.suit
+        setTrumpCards(for: trump!)
     }
 
-    public func initialCardsDealForPlayers(players: [Player]) {
-
+    public mutating func initialCardsDealForPlayers(players: [Player]) {
+        players.forEach() { p in
+            p.hand = []
+            p.hand?.append(contentsOf: cards.dropLast(6))
+            cards.removeLast(6)
+        }
     }
 
-    public func setTrumpCards(for suit:Suit) {
-
+    public mutating func setTrumpCards(for suit:Suit) {
+        cards.enumerated().forEach() { index, card in
+            if card.suit == suit {
+                self.cards[index].isTrump = true
+            }
+        }
     }
 }
 
